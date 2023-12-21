@@ -1,0 +1,59 @@
+from sklearn.preprocessing import LabelEncoder 
+from sklearn.tree import DecisionTreeClassifier 
+import pandas as pd 
+import numpy as np  
+from sklearn.tree import plot_tree 
+import matplotlib.pyplot as plt 
+from sklearn.model_selection import train_test_split 
+import seaborn as sns
+
+File_path = 'D:/data/' 
+File_name = 'car_data.csv' 
+
+df = pd.read_csv(File_path + File_name)
+
+df.drop(columns=['User ID'], inplace=True) 
+encoders = [] 
+
+for i in range(0, len(df.columns)-1):
+    enc = LabelEncoder() 
+    df.iloc[:, i] = enc.fit_transform(df.iloc[:, i])
+    encoders.append(enc) 
+
+x = df.iloc[:, 0:3] 
+y = df['Purchased'] 
+x_train, x_test, y_train, y_test = train_test_split(x, y) 
+model = DecisionTreeClassifier(criterion='entropy') 
+model.fit(x_train, y_train)  
+
+x_pred = ['Male', 30, 42000] 
+
+for i in range(0, len(df.columns)-1):
+    x_pred[i] = encoders[i].transform([x_pred[i]])
+
+
+x_pred = np.array(x_pred).reshape(1, -1)
+
+feature = x.columns.tolist() 
+data_class = y.unique().astype(str)  
+
+plt.figure(figsize=(25, 20))  
+_ = plot_tree(model,
+              feature_names=feature,
+              class_names=data_class,
+              label='all', 
+              impurity=True,
+              precision=3,
+              filled=True,
+              rounded=True, 
+              fontsize=16)
+
+plt.show() 
+
+feature_importances = model.feature_importances_ 
+feature_names = ['gender', 'age', 'AnnualSalary'] 
+
+sns.set(rc={'figure.figsize': (11.7, 8.27)}) 
+sns.barplot(x=feature_importances, y=feature_names)
+
+print(feature_importances)
