@@ -33,7 +33,10 @@ for i in range(0, len(df.columns)-1):
 
 
 x_pred = np.array(x_pred).reshape(1, -1)
-
+score = model.score(x_train,y_train)
+print('Accuracy : ','{:.2f}'.format(score))
+score_test = model.score(x_test,y_test)
+print('Accuracy : ','{:.2f}'.format(score_test))
 feature = x.columns.tolist() 
 data_class = y.unique().astype(str)  
 
